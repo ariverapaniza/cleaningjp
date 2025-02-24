@@ -13,7 +13,6 @@ $query = "SELECT j.JobID, j.ClientName, j.JobDescription, j.ServiceDate, u.Usern
           FROM Jobs j
           INNER JOIN Users u ON j.UserID = u.UserID
           ORDER BY j.DateCreated DESC";
-
 $result = $mysqli->query($query);
 ?>
 
@@ -46,7 +45,95 @@ $result = $mysqli->query($query);
 <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-5">
-        <h2 class="mb-4">Admin Dashboard</h2>
+        <!-- Four Admin Panels Cards -->
+        <div class="text-center mb-4">
+            <h2>Admin Dashboard</h2>
+        </div>
+        <div class="row mb-4 text-center">
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="register_user.php">
+                        <img src="img/register_users.png" class="card-img-top" alt="Register User"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="register_user.php"
+                                class="text-decoration-none text-dark">Register User</a></h5>
+                        <p class="card-text">Create new admin and cleaning staff accounts.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="register_client.php">
+                        <img src="img/register_client.png" class="card-img-top" alt="Register Client"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="register_client.php"
+                                class="text-decoration-none text-dark">Register Client</a></h5>
+                        <p class="card-text">Manually register new client details.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="register_item.php">
+                        <img src="img/register_item.png" class="card-img-top" alt="Register Item"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="register_item.php"
+                                class="text-decoration-none text-dark">Register Item</a></h5>
+                        <p class="card-text">Add new cleaning items and images.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="update_items.php">
+                        <img src="img/update_items.png" class="card-img-top" alt="Update Items"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="update_items.php" class="text-decoration-none text-dark">Update
+                                Items</a></h5>
+                        <p class="card-text">Manage inventory levels and update quantities.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="job_form_admin.php">
+                        <img src="img/job_form_admin.png" class="card-img-top" alt="Update Items"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="job_form_admin.php" class="text-decoration-none text-dark">Add a
+                                Job</a></h5>
+                        <p class="card-text">Create and assign a Job.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 d-inline-block">
+                <div class="card h-100">
+                    <a href="users_list.php">
+                        <img src="img/users_list.png" class="card-img-top" alt="Update Items"
+                            style="height: 150px; object-fit: contain;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="users_list.php" class="text-decoration-none text-dark">List of
+                                Users</a></h5>
+                        <p class="card-text">View and manage all registered users.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- End of Admin Panels Cards -->
+
+        <!-- Job Table Section -->
+
         <div class="mb-3">
             <input type="text" id="searchInput" onkeyup="searchJobs()" placeholder="Search jobs..."
                 class="form-control">

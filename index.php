@@ -2,6 +2,16 @@
 // index.php
 require 'config.php';
 
+// If user is already logged in, redirect accordingly.
+if (isLoggedIn()) {
+    if (isAdmin()) {
+        header("Location: dashboard.php");
+    } else {
+        header("Location: user_dashboard.php");
+    }
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
@@ -26,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($IsAdmin) {
                 header("Location: dashboard.php");
             } else {
-                header("Location: job_form.php");
+                header("Location: user_dashboard.php");
             }
             exit;
         } else {
