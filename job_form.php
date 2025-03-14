@@ -11,17 +11,28 @@ if (!isLoggedIn() || isAdmin()) {
 // Fetch available items from the Items table
 $itemsResult = $mysqli->query("SELECT * FROM Items");
 
+// Fetch clients for the dropdown
+$clientsResult = $mysqli->query("SELECT ClientID, ClientName FROM Clients ORDER BY ClientName ASC");
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Collect and sanitize job data
-    $clientName = $mysqli->real_escape_string(trim($_POST['client_name']));
+    $clientID = intval($_POST['client_id']);
     $jobDescription = $mysqli->real_escape_string(trim($_POST['job_description']));
     $serviceDate = $mysqli->real_escape_string(trim($_POST['service_date']));
     $location = $mysqli->real_escape_string(trim($_POST['location']));
     $estimatedDuration = $mysqli->real_escape_string(trim($_POST['estimated_duration']));
 
-    // Insert into Jobs table
-    $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $_SESSION['UserID'], $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
+    // Fetch the actual client name based on ClientID
+    $stmt = $mysqli->prepare("SELECT ClientName FROM Clients WHERE ClientID = ?");
+    $stmt->bind_param("i", $clientID);
+    $stmt->execute();
+    $stmt->bind_result($clientName);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Insert into Jobs table with ClientID and ClientName
+    $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iisssss", $_SESSION['UserID'], $clientID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
     if ($stmt->execute()) {
         $jobID = $stmt->insert_id;
         $stmt->close();
@@ -66,10 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Create Job Form - Cleaning App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Optional: some spacing adjustments for the search input */
-        #itemSearchInput {
-            margin-bottom: 15px;
-        }
+    /* Optional: some spacing adjustments for the search input */
+    #itemSearchInput {
+        margin-bottom: 15px;
+    }
     </style>
 </head>
 
@@ -89,8 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <!-- Job Details Fields -->
             <div class="mb-3">
                 <label class="form-label">Client Name</label>
-                <input type="text" name="client_name" class="form-control" required>
+                <select name="client_id" class="form-select" required>
+                    <option value="">Select a client...</option>
+                    <?php while ($client = $clientsResult->fetch_assoc()): ?>
+                    <option value="<?php echo htmlspecialchars($client['ClientID']); ?>">
+                        <?php echo htmlspecialchars($client['ClientName']); ?>
+                    </option>
+                    <?php endwhile; ?>
+                </select>
             </div>
+
+
+
             <div class="mb-3">
                 <label class="form-label">Job Description</label>
                 <textarea name="job_description" class="form-control" required></textarea>
@@ -110,10 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <!-- Display Success or Error Messages -->
             <?php if (isset($_GET['success'])): ?>
-                <div class="alert alert-success">Job form submitted successfully!</div>
+            <div class="alert alert-success">Job form submitted successfully!</div>
             <?php endif; ?>
             <?php if (isset($error)): ?>
-                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
 
             <!-- Items Section -->
@@ -134,27 +155,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </thead>
                 <tbody>
                     <?php while ($item = $itemsResult->fetch_assoc()): ?>
-                        <tr>
-                            <td>
-                                <!-- Explicitly set value="on" -->
-                                <input type="checkbox" name="item_<?php echo $item['ItemID']; ?>" value="on">
-                            </td>
-                            <td>
-                                <?php if ($item['ImagePath']): ?>
-                                    <img src="<?php echo htmlspecialchars($item['ImagePath']); ?>" width="50" height="50"
-                                        alt="<?php echo htmlspecialchars($item['ItemName']); ?>">
-                                <?php else: ?>
-                                    N/A
-                                <?php endif; ?>
-                            </td>
-                            <td class="item-name"><?php echo htmlspecialchars($item['ItemName']); ?></td>
-                            <td class="item-desc"><?php echo htmlspecialchars($item['Description']); ?></td>
-                            <td><?php echo htmlspecialchars($item['Quantity']); ?></td>
-                            <td>
-                                <input type="number" name="qty_<?php echo $item['ItemID']; ?>" min="0" class="form-control"
-                                    placeholder="0">
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>
+                            <!-- Explicitly set value="on" -->
+                            <input type="checkbox" name="item_<?php echo $item['ItemID']; ?>" value="on">
+                        </td>
+                        <td>
+                            <?php if ($item['ImagePath']): ?>
+                            <img src="<?php echo htmlspecialchars($item['ImagePath']); ?>" width="50" height="50"
+                                alt="<?php echo htmlspecialchars($item['ItemName']); ?>">
+                            <?php else: ?>
+                            N/A
+                            <?php endif; ?>
+                        </td>
+                        <td class="item-name"><?php echo htmlspecialchars($item['ItemName']); ?></td>
+                        <td class="item-desc"><?php echo htmlspecialchars($item['Description']); ?></td>
+                        <td><?php echo htmlspecialchars($item['Quantity']); ?></td>
+                        <td>
+                            <input type="number" name="qty_<?php echo $item['ItemID']; ?>" min="0" class="form-control"
+                                placeholder="0">
+                        </td>
+                    </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
@@ -162,27 +183,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to filter items based on search input (by item name and description)
-        function searchItems() {
-            var input = document.getElementById("itemSearchInput").value.toLowerCase();
-            var table = document.getElementById("itemsTable");
-            var tr = table.getElementsByTagName("tr");
+    // Function to filter items based on search input (by item name and description)
+    function searchItems() {
+        var input = document.getElementById("itemSearchInput").value.toLowerCase();
+        var table = document.getElementById("itemsTable");
+        var tr = table.getElementsByTagName("tr");
 
-            // Loop through all table rows (skip the header row)
-            for (var i = 1; i < tr.length; i++) {
-                var tdName = tr[i].getElementsByClassName("item-name")[0];
-                var tdDesc = tr[i].getElementsByClassName("item-desc")[0];
-                if (tdName && tdDesc) {
-                    var txtValueName = tdName.textContent || tdName.innerText;
-                    var txtValueDesc = tdDesc.textContent || tdDesc.innerText;
-                    if (txtValueName.toLowerCase().indexOf(input) > -1 || txtValueDesc.toLowerCase().indexOf(input) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
+        // Loop through all table rows (skip the header row)
+        for (var i = 1; i < tr.length; i++) {
+            var tdName = tr[i].getElementsByClassName("item-name")[0];
+            var tdDesc = tr[i].getElementsByClassName("item-desc")[0];
+            if (tdName && tdDesc) {
+                var txtValueName = tdName.textContent || tdName.innerText;
+                var txtValueDesc = tdDesc.textContent || tdDesc.innerText;
+                if (txtValueName.toLowerCase().indexOf(input) > -1 || txtValueDesc.toLowerCase().indexOf(input) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
                 }
             }
         }
+    }
     </script>
 </body>
 

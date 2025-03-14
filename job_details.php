@@ -117,6 +117,9 @@ $stmt2->close();
 
         <!-- Back Button -->
         <a href="dashboard.php" class="btn btn-secondary">Back</a>
+
+        <!-- Print Form Button -->
+        <button type="button" class="btn btn-primary" onclick="window.print();">Print Form</button>
     </div>
 </body>
 

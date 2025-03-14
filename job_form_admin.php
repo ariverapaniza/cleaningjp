@@ -11,21 +11,32 @@ if (!isLoggedIn() || !isAdmin()) {
 // Fetch available items from the Items table
 $itemsResult = $mysqli->query("SELECT * FROM Items");
 
+// Fetch clients for the dropdown
+$clientsResult = $mysqli->query("SELECT ClientID, ClientName FROM Clients ORDER BY ClientName ASC");
+
 // Fetch non-admin (cleaning staff) users for the dropdown
 $usersResult = $mysqli->query("SELECT UserID, Username FROM Users WHERE IsAdmin = 0 ORDER BY Username ASC");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Collect and sanitize job data
     $assignedUserID = intval($_POST['assigned_user']);
-    $clientName = $mysqli->real_escape_string(trim($_POST['client_name']));
+    $clientID = intval($_POST['client_id']);
     $jobDescription = $mysqli->real_escape_string(trim($_POST['job_description']));
     $serviceDate = $mysqli->real_escape_string(trim($_POST['service_date']));
     $location = $mysqli->real_escape_string(trim($_POST['location']));
     $estimatedDuration = $mysqli->real_escape_string(trim($_POST['estimated_duration']));
 
-    // Insert into Jobs table
-    $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $assignedUserID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
+    // Fetch the actual client name based on ClientID
+    $stmt = $mysqli->prepare("SELECT ClientName FROM Clients WHERE ClientID = ?");
+    $stmt->bind_param("i", $clientID);
+    $stmt->execute();
+    $stmt->bind_result($clientName);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Insert into Jobs table with ClientID and ClientName
+    $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iisssss", $assignedUserID, $clientID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
     if ($stmt->execute()) {
         $jobID = $stmt->insert_id;
         $stmt->close();
@@ -107,7 +118,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <!-- Job Details Fields -->
             <div class="mb-3">
                 <label class="form-label">Client Name</label>
-                <input type="text" name="client_name" class="form-control" required>
+                <select name="client_id" class="form-select" required>
+                    <option value="">Select a client...</option>
+                    <?php while ($client = $clientsResult->fetch_assoc()): ?>
+                    <option value="<?php echo htmlspecialchars($client['ClientID']); ?>">
+                        <?php echo htmlspecialchars($client['ClientName']); ?>
+                    </option>
+                    <?php endwhile; ?>
+                </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Job Description</label>
