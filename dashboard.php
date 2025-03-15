@@ -8,11 +8,24 @@ if (!isLoggedIn() || !isAdmin()) {
     exit;
 }
 
-// Fetch jobs joined with user details
-$query = "SELECT j.JobID, j.ClientName, j.JobDescription, j.ServiceDate, u.Username
+// Pagination settings
+$jobsPerPage = 10; // Number of jobs per page
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1; // Get the current page or default to 1
+$offset = ($page - 1) * $jobsPerPage; // Calculate the offset
+
+// Fetch total number of jobs
+$totalJobsQuery = "SELECT COUNT(*) AS total FROM Jobs";
+$totalJobsResult = $mysqli->query($totalJobsQuery);
+$totalJobsRow = $totalJobsResult->fetch_assoc();
+$totalJobs = $totalJobsRow['total'];
+$totalPages = ceil($totalJobs / $jobsPerPage);
+
+// Fetch jobs with pagination
+$query = "SELECT j.JobID, j.ClientID, j.ClientName, j.JobDescription, j.ServiceDate, u.Username
           FROM Jobs j
           INNER JOIN Users u ON j.UserID = u.UserID
-          ORDER BY j.DateCreated DESC";
+          ORDER BY j.DateCreated DESC
+          LIMIT $jobsPerPage OFFSET $offset";
 $result = $mysqli->query($query);
 ?>
 
@@ -147,6 +160,7 @@ $result = $mysqli->query($query);
                     <th>Service Date</th>
                     <th>Created By</th>
                     <th>Details</th>
+                    <th>Actions</th> <!-- New column -->
                 </tr>
             </thead>
             <tbody>
@@ -161,10 +175,41 @@ $result = $mysqli->query($query);
                         <a href="job_details.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-primary btn-sm">Open
                             Form</a>
                     </td>
+                    <td>
+                        <a href="edit_job.php?jobid=<?php echo $row['JobID']; ?>"
+                            class="btn btn-warning btn-sm">Edit</a>
+                        <a href="delete_job.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this job?');">Delete</a>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php if ($page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="dashboard.php?page=<?php echo ($page - 1); ?>">Previous</a>
+                </li>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                    <a class="page-link" href="dashboard.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                </li>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="dashboard.php?page=<?php echo ($page + 1); ?>">Next</a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -46,6 +46,30 @@ if ($result->num_rows == 0) {
 }
 $user = $result->fetch_assoc();
 $stmt->close();
+
+// Pagination settings for assigned jobs
+$jobsPerPage = 10;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$offset = ($page - 1) * $jobsPerPage;
+
+// Fetch total number of assigned jobs
+$totalJobsQuery = "SELECT COUNT(*) AS total FROM Jobs WHERE UserID = ?";
+$stmt = $mysqli->prepare($totalJobsQuery);
+$stmt->bind_param("i", $userID);
+$stmt->execute();
+$result = $stmt->get_result();
+$totalJobsRow = $result->fetch_assoc();
+$totalJobs = $totalJobsRow['total'];
+$totalPages = ceil($totalJobs / $jobsPerPage);
+$stmt->close();
+
+// Fetch assigned jobs with pagination
+$query = "SELECT JobID, ClientName, JobDescription, ServiceDate FROM Jobs WHERE UserID = ? ORDER BY DateCreated DESC LIMIT ? OFFSET ?";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("iii", $userID, $jobsPerPage, $offset);
+$stmt->execute();
+$assignedJobsResult = $stmt->get_result();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -62,11 +86,12 @@ $stmt->close();
     <div class="container mt-5">
         <h2>User Profile: <?php echo htmlspecialchars($user['Username']); ?></h2>
         <?php if (isset($msg)): ?>
-        <div class="alert alert-success"><?php echo htmlspecialchars($msg); ?></div>
+            <div class="alert alert-success"><?php echo htmlspecialchars($msg); ?></div>
         <?php endif; ?>
         <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
+
         <form method="post" action="user_profile.php?userid=<?php echo $userID; ?>">
             <div class="mb-3">
                 <label class="form-label">User ID</label>
@@ -111,8 +136,62 @@ $stmt->close();
             <button type="submit" class="btn btn-primary">Update Profile</button>
             <a href="users_list.php" class="btn btn-secondary">Back to User List</a>
         </form>
+
+        <!-- Assigned Jobs Section -->
+        <h3 class="mt-5">Assigned Jobs</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Client Name</th>
+                    <th>Job Description</th>
+                    <th>Service Date</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($job = $assignedJobsResult->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($job['JobID']); ?></td>
+                        <td><?php echo htmlspecialchars($job['ClientName']); ?></td>
+                        <td><?php echo htmlspecialchars($job['JobDescription']); ?></td>
+                        <td><?php echo htmlspecialchars($job['ServiceDate']); ?></td>
+                        <td>
+                            <a href="job_details.php?jobid=<?php echo $job['JobID']; ?>" class="btn btn-primary btn-sm">Open
+                                Form</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <!-- Pagination for Assigned Jobs -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php if ($page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="user_profile.php?userid=<?php echo $userID; ?>&page=<?php echo ($page - 1); ?>">Previous</a>
+                    </li>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                        <a class="page-link"
+                            href="user_profile.php?userid=<?php echo $userID; ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="user_profile.php?userid=<?php echo $userID; ?>&page=<?php echo ($page + 1); ?>">Next</a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
