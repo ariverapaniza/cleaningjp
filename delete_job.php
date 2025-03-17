@@ -2,7 +2,7 @@
 // delete_job.php
 require 'config.php';
 
-// Only admin users should access this page
+// Only admin users should access this page with this logic
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
