@@ -52,6 +52,9 @@ $stmt2->close();
 <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-5">
+        <div class="text-center mb-4">
+            <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
+        </div>
         <h2 class="mb-4">Job Details</h2>
 
         <!-- Group 1: Basic Job Information -->
