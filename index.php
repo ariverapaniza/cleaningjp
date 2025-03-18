@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="bg-light">
     <?php include('navbar.php'); ?>
     <div class="container mt-5">
+        <!-- added the logo for the cleaning app -->
         <div class="text-center mb-4">
             <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
         </div>
