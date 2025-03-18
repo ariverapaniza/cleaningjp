@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    // Loop through posted data for each selected item
+    // Loop through posted data for each selected item and insert new JobItems entries
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'item_') === 0 && $value === "on") {
             $itemID = str_replace('item_', '', $key);

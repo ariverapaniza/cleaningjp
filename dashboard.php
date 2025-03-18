@@ -37,28 +37,28 @@ $result = $mysqli->query($query);
     <title>Admin Dashboard - Cleaning App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
-    function searchJobs() {
-        var input = document.getElementById("searchInput").value.toLowerCase();
-        var rows = document.getElementById("jobsTable").getElementsByTagName("tr");
-        for (var i = 1; i < rows.length; i++) {
-            var cells = rows[i].getElementsByTagName("td");
-            var found = false;
-            for (var j = 0; j < cells.length; j++) {
-                if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
-                    found = true;
-                    break;
+        function searchJobs() {
+            var input = document.getElementById("searchInput").value.toLowerCase();
+            var rows = document.getElementById("jobsTable").getElementsByTagName("tr");
+            for (var i = 1; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName("td");
+                var found = false;
+                for (var j = 0; j < cells.length; j++) {
+                    if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
                 }
+                rows[i].style.display = found ? "" : "none";
             }
-            rows[i].style.display = found ? "" : "none";
         }
-    }
     </script>
 </head>
 
 <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-5">
-        <!-- Four Admin Panels Cards -->
+        <!-- Six Admin Panels Cards -->
         <div class="text-center mb-4">
             <h2>Admin Dashboard</h2>
         </div>
@@ -165,23 +165,23 @@ $result = $mysqli->query($query);
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['JobID']); ?></td>
-                    <td><?php echo htmlspecialchars($row['ClientName']); ?></td>
-                    <td><?php echo htmlspecialchars($row['JobDescription']); ?></td>
-                    <td><?php echo htmlspecialchars($row['ServiceDate']); ?></td>
-                    <td><?php echo htmlspecialchars($row['Username']); ?></td>
-                    <td>
-                        <a href="job_details.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-primary btn-sm">Open
-                            Form</a>
-                    </td>
-                    <td>
-                        <a href="edit_job.php?jobid=<?php echo $row['JobID']; ?>"
-                            class="btn btn-warning btn-sm">Edit</a>
-                        <a href="delete_job.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Are you sure you want to delete this job?');">Delete</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['JobID']); ?></td>
+                        <td><?php echo htmlspecialchars($row['ClientName']); ?></td>
+                        <td><?php echo htmlspecialchars($row['JobDescription']); ?></td>
+                        <td><?php echo htmlspecialchars($row['ServiceDate']); ?></td>
+                        <td><?php echo htmlspecialchars($row['Username']); ?></td>
+                        <td>
+                            <a href="job_details.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-primary btn-sm">Open
+                                Form</a>
+                        </td>
+                        <td>
+                            <a href="edit_job.php?jobid=<?php echo $row['JobID']; ?>"
+                                class="btn btn-warning btn-sm">Edit</a>
+                            <a href="delete_job.php?jobid=<?php echo $row['JobID']; ?>" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this job?');">Delete</a>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -190,21 +190,21 @@ $result = $mysqli->query($query);
         <nav>
             <ul class="pagination justify-content-center">
                 <?php if ($page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="dashboard.php?page=<?php echo ($page - 1); ?>">Previous</a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="dashboard.php?page=<?php echo ($page - 1); ?>">Previous</a>
+                    </li>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                    <a class="page-link" href="dashboard.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                </li>
+                    <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                        <a class="page-link" href="dashboard.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    </li>
                 <?php endfor; ?>
 
                 <?php if ($page < $totalPages): ?>
-                <li class="page-item">
-                    <a class="page-link" href="dashboard.php?page=<?php echo ($page + 1); ?>">Next</a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="dashboard.php?page=<?php echo ($page + 1); ?>">Next</a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </nav>

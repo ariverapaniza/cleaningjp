@@ -11,7 +11,7 @@ if (!isLoggedIn() || !isAdmin()) {
 if (isset($_GET['jobid'])) {
     $jobID = intval($_GET['jobid']);
 
-    // Delete the job from the database
+    // Delete the job from the database, should be done with a prepared statement
     $stmt = $mysqli->prepare("DELETE FROM Jobs WHERE JobID = ?");
     $stmt->bind_param("i", $jobID);
 

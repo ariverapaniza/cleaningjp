@@ -1,7 +1,7 @@
 <?php
 // config.php
 
-// Database configuration
+// Database configuration - CHANGE THIS WHEN MOVING TO PRODUCTION IN HOSTINGER
 $host = 'localhost';
 $db   = 'cleaningjp';
 $user = 'root';
