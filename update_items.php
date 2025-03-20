@@ -65,6 +65,12 @@ $result = $mysqli->query($query);
         height: 50px;
         object-fit: cover;
     }
+
+    /* Highlight row when quantity < 10 */
+    .low-stock {
+        background-color: rgb(230, 115, 125);
+        /* A light red background from Bootstrap's alert-danger */
+    }
     </style>
     <script>
     // Function to filter items based on search input (by item name and description)
@@ -120,6 +126,10 @@ $result = $mysqli->query($query);
             </thead>
             <tbody>
                 <?php while ($item = $result->fetch_assoc()): ?>
+                <?php
+                    // Apply a special CSS class if quantity < 10
+                    $rowClass = ($item['Quantity'] < 10) ? 'low-stock' : '';
+                    ?>
                 <tr>
                     <td><?php echo htmlspecialchars($item['ItemID']); ?></td>
                     <td>
@@ -132,7 +142,11 @@ $result = $mysqli->query($query);
                     </td>
                     <td class="item-name"><?php echo htmlspecialchars($item['ItemName']); ?></td>
                     <td class="item-desc"><?php echo htmlspecialchars($item['Description']); ?></td>
-                    <td><?php echo htmlspecialchars($item['Quantity']); ?></td>
+                    <td><?php echo htmlspecialchars($item['Quantity']); ?>
+                        <?php if ($item['Quantity'] < 10): ?>
+                        <span class="badge bg-danger ms-2">Low stock!</span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <!-- Form to update the quantity for this item -->
                         <form method="post" action="update_items.php" class="d-flex">
