@@ -39,91 +39,97 @@ $stmt2->execute();
 $jobItemsResult = $stmt2->get_result();
 $stmt2->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <title>Job Details - Cleaning App</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
     <?php include('navbar.php'); ?>
-    <div class="container mt-5">
-        <div class="text-center mb-4">
-            <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
+    <!-- Wrap details content in a panel -->
+    <div class="container mt-5 panel">
+        <div class="text-center panel-heading">
+            <h2 class="title">Job Details</h2>
         </div>
-        <h2 class="mb-4">Job Details</h2>
-
-        <!-- Group 1: Basic Job Information -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>Job Information</strong>
+        <div class="p-4 panel-body">
+            <div class="text-center mb-4">
+                <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
             </div>
-            <div class="card-body">
-                <p><strong>Job ID:</strong> <?php echo htmlspecialchars($job['JobID']); ?></p>
-                <p><strong>Client Name:</strong> <?php echo htmlspecialchars($job['ClientName']); ?></p>
-                <p><strong>Job Description:</strong> <?php echo htmlspecialchars($job['JobDescription']); ?></p>
-                <p><strong>Service Date:</strong> <?php echo htmlspecialchars($job['ServiceDate']); ?></p>
-                <p><strong>Created By:</strong> <?php echo htmlspecialchars($job['Username']); ?></p>
+            <!-- Group 1: Basic Job Information -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>Job Information</strong>
+                </div>
+                <div class="card-body">
+                    <p><strong>Job ID:</strong> <?php echo htmlspecialchars($job['JobID']); ?></p>
+                    <p><strong>Client Name:</strong> <?php echo htmlspecialchars($job['ClientName']); ?></p>
+                    <p><strong>Job Description:</strong> <?php echo htmlspecialchars($job['JobDescription']); ?></p>
+                    <p><strong>Service Date:</strong> <?php echo htmlspecialchars($job['ServiceDate']); ?></p>
+                    <p><strong>Created By:</strong> <?php echo htmlspecialchars($job['Username']); ?></p>
+                </div>
+            </div>
+            <!-- Group 2: Additional Details -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>Additional Details</strong>
+                </div>
+                <div class="card-body">
+                    <p><strong>Location:</strong> <?php echo htmlspecialchars($job['Location']); ?></p>
+                    <p><strong>Estimated Duration:</strong> <?php echo htmlspecialchars($job['EstimatedDuration']); ?></p>
+                </div>
+            </div>
+            <!-- Group 3: Selected Items -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>Selected Items</strong>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Image</th>
+                                <th>Item Name</th>
+                                <th>Description</th>
+                                <th>Quantity Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($item = $jobItemsResult->fetch_assoc()): ?>
+                                <tr>
+                                    <td>
+                                        <?php if ($item['ImagePath']): ?>
+                                            <img src="<?php echo htmlspecialchars($item['ImagePath']); ?>" alt="<?php echo htmlspecialchars($item['ItemName']); ?>" width="50" height="50">
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($item['ItemName']); ?></td>
+                                    <td><?php echo htmlspecialchars($item['Description']); ?></td>
+                                    <td><?php echo htmlspecialchars($item['QuantityUsed']); ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between">
+                <a href="dashboard.php" class="btn btn-secondary">Back</a>
+                <button type="button" class="btn btn-primary" onclick="window.print();">Print Form</button>
             </div>
         </div>
-
-        <!-- Group 2: Additional Details -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>Additional Details</strong>
-            </div>
-            <div class="card-body">
-                <p><strong>Location:</strong> <?php echo htmlspecialchars($job['Location']); ?></p>
-                <p><strong>Estimated Duration:</strong> <?php echo htmlspecialchars($job['EstimatedDuration']); ?></p>
-            </div>
-        </div>
-
-        <!-- Group 3: Selected Items -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>Selected Items</strong>
-            </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Item Image</th>
-                            <th>Item Name</th>
-                            <th>Description</th>
-                            <th>Quantity Used</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($item = $jobItemsResult->fetch_assoc()): ?>
-                        <tr>
-                            <td>
-                                <?php if ($item['ImagePath']): ?>
-                                <img src="<?php echo htmlspecialchars($item['ImagePath']); ?>"
-                                    alt="<?php echo htmlspecialchars($item['ItemName']); ?>" width="50" height="50">
-                                <?php else: ?>
-                                N/A
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($item['ItemName']); ?></td>
-                            <td><?php echo htmlspecialchars($item['Description']); ?></td>
-                            <td><?php echo htmlspecialchars($item['QuantityUsed']); ?></td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Back Button -->
-        <a href="dashboard.php" class="btn btn-secondary">Back</a>
-
-        <!-- Print Form Button -->
-        <button type="button" class="btn btn-primary" onclick="window.print();">Print Form</button>
     </div>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

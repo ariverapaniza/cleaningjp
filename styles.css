@@ -1,0 +1,201 @@
+/* styles.css */
+
+/* Import Noto Sans font */
+@import url("https://fonts.googleapis.com/css?family=Noto+Sans");
+
+/* Base font & page background gradient */
+.demo,
+body {
+  font-family: "Noto Sans", sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: linear-gradient(to right, #9bbdd3, #769bb5);
+}
+
+/* Panel container with gradient background */
+.panel {
+  background: linear-gradient(to right, #2980b9, #2c3e50);
+  padding: 0;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.05), 0 0 0 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+/* Panel heading */
+.panel .panel-heading {
+  padding: 20px 15px;
+  border-radius: 10px 10px 0 0;
+  margin: 0;
+  background: transparent;
+}
+
+.panel .panel-heading .title {
+  color: #fff !important;
+  font-size: 28px;
+  font-weight: 500;
+  text-transform: capitalize;
+  line-height: 40px;
+  margin: 0;
+}
+
+/* Panel body */
+.panel .panel-body {
+  padding: 0;
+}
+
+/* Panel footer */
+.panel .panel-footer {
+  color: #fff;
+  background-color: transparent;
+  padding: 15px;
+  border: none;
+}
+
+/* Table styling */
+.panel .panel-body .table {
+  margin-bottom: 0;
+  border-radius: 0 0 10px 10px;
+}
+
+/* Zebra striping: each row a different shade
+   Add !important to override any Bootstrap row styling. */
+.panel .panel-body .table tbody tr:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.panel .panel-body .table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Table head & cells */
+.panel .panel-body .table thead tr th {
+  color: #000 !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  font-size: 16px !important;
+  font-weight: 500;
+  text-transform: uppercase;
+  padding: 12px;
+  border: none !important;
+}
+.panel .panel-body .table tbody tr td {
+  color: #000 !important;
+  font-size: 15px !important;
+  padding: 10px 12px;
+  vertical-align: middle;
+  border: none !important;
+}
+
+/* Search input styling with !important overrides */
+.search-input {
+  border-radius: 20px !important;
+  border: 1px solid #ccc !important;
+  padding: 10px 15px !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: #333 !important;
+  transition: box-shadow 0.3s ease;
+  width: 100% !important;
+}
+.search-input:focus {
+  background-color: #fff !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) !important;
+  outline: none !important;
+}
+
+/* Custom Navbar Styling */
+.navbar-custom {
+  background: linear-gradient(to right, #2980b9, #2c3e50) !important;
+  border: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link,
+.navbar-custom .navbar-text {
+  color: #fff !important;
+}
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link:focus {
+  color: #fff !important;
+}
+.navbar-custom .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Pagination styling */
+.pagination li a {
+  color: #fff !important;
+  background-color: transparent !important;
+  border: 2px solid transparent !important;
+  font-size: 18px !important;
+  font-weight: 500;
+  text-align: center;
+  line-height: 31px;
+  width: 35px;
+  height: 35px;
+  margin: 0 3px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+.pagination li a:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+.pagination li.active a,
+.pagination li.active a:hover {
+  border-color: #fff !important;
+}
+
+
+.login-card {
+  background-color: #f0f0f0; /* Light grey background to contrast with page gradient */
+  border-radius: 20px;       /* Rounded corners */
+  width: 350px;              /* Fixed width for the card */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  position: relative;
+}
+
+/* The input fields inside the login card */
+.login-card .login-input {
+  border-radius: 20px;       /* Round the corners of the input */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+}
+
+/* The login button */
+.login-card .login-btn {
+  background-color: #2c3be3; /* Purple accent color */
+  color: #fff;
+  border-radius: 20px;
+  padding: 10px 30px;
+  border: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+.login-card .login-btn:hover {
+  background-color: #5118e1; /* Darker purple on hover */
+}
+
+/* Optional: style for the user icon area if needed */
+.login-card .login-icon img {
+  width: 80px;
+  border-radius: 50%;
+  /* or remove border-radius if you prefer a square icon */
+}
+
+
+.form-panel {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.panel .panel-body {
+  padding: 20px !important; /* Or p-4 equivalent */
+}
+
+
+
+.card {
+  background-color: #90bbd9;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
