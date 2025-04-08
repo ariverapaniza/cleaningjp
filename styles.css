@@ -183,7 +183,6 @@ body {
   /* or remove border-radius if you prefer a square icon */
 }
 
-
 .form-panel {
   max-width: 700px;
   margin: 0 auto;
@@ -192,8 +191,6 @@ body {
 .panel .panel-body {
   padding: 20px !important; /* Or p-4 equivalent */
 }
-
-
 
 .card {
   background-color: #90bbd9;
