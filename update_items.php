@@ -1,8 +1,6 @@
 <?php
-// update_items.php
 require 'config.php';
 
-// Only admin users should access this page
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
@@ -11,9 +9,7 @@ if (!isLoggedIn() || !isAdmin()) {
 $msg = '';
 $error = '';
 
-// Handle update submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Delete functionality
     if (isset($_POST['delete_item'])) {
         $itemID = intval($_POST['item_id']);
         $stmt = $mysqli->prepare("DELETE FROM Items WHERE ItemID = ?");
@@ -25,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
     }
-    // Update functionality
     elseif (isset($_POST['update_item'])) {
         $itemID = intval($_POST['item_id']);
         $newQuantity = intval($_POST['new_quantity']);
@@ -40,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all items from the Items table
+// fetch all items from the Items table
 $query = "SELECT * FROM Items ORDER BY DateCreated DESC";
 $result = $mysqli->query($query);
 ?>
@@ -93,7 +88,6 @@ $result = $mysqli->query($query);
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="panel-heading text-center">
             <h2 class="title">Update Items Inventory</h2>
@@ -161,7 +155,6 @@ $result = $mysqli->query($query);
             <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
         </div>
         <div class="panel-footer text-center">
-            <!-- You can add pagination here if needed -->
         </div>
     </div>
     <!-- Bootstrap JS Bundle -->

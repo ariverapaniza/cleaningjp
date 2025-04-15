@@ -1,21 +1,19 @@
 <?php
-// user_profile.php
 require 'config.php';
 
-// Only admin users should access this page
+// only admin users should access this page
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Get user ID from GET parameter
 if (!isset($_GET['userid'])) {
     die("User ID not specified.");
 }
 
 $userID = intval($_GET['userid']);
 
-// Process form submission to update profile
+// process form submission for the update profile
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $mysqli->real_escape_string(trim($_POST['username']));
     $email = $mysqli->real_escape_string(trim($_POST['email']));
@@ -34,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 }
 
-// Retrieve user details
+// retrieve the user details to add or update them
 $stmt = $mysqli->prepare("SELECT UserID, Username, Email, IsAdmin, Address, JobDescription, Phone, About FROM Users WHERE UserID = ?");
 $stmt->bind_param("i", $userID);
 $stmt->execute();
@@ -45,12 +43,10 @@ if ($result->num_rows == 0) {
 $user = $result->fetch_assoc();
 $stmt->close();
 
-// Pagination settings for assigned jobs
 $jobsPerPage = 10;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $offset = ($page - 1) * $jobsPerPage;
 
-// Fetch total number of assigned jobs
 $totalJobsQuery = "SELECT COUNT(*) AS total FROM Jobs WHERE UserID = ?";
 $stmt = $mysqli->prepare($totalJobsQuery);
 $stmt->bind_param("i", $userID);
@@ -61,7 +57,6 @@ $totalJobs = $totalJobsRow['total'];
 $totalPages = ceil($totalJobs / $jobsPerPage);
 $stmt->close();
 
-// Fetch assigned jobs with pagination
 $query = "SELECT JobID, ClientName, JobDescription, ServiceDate FROM Jobs WHERE UserID = ? ORDER BY DateCreated DESC LIMIT ? OFFSET ?";
 $stmt = $mysqli->prepare($query);
 $stmt->bind_param("iii", $userID, $jobsPerPage, $offset);
@@ -87,7 +82,6 @@ $stmt->close();
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="panel-heading text-center">
             <h2 class="title">User Profile: <?php echo htmlspecialchars($user['Username']); ?></h2>
@@ -133,10 +127,9 @@ $stmt->close();
                     <label class="form-label">About</label>
                     <textarea name="about" class="form-control"><?php echo htmlspecialchars($user['About']); ?></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Update Profile</button>
+                <button type="submit" class="btn btn-success">Update Profile</button>
                 <a href="users_list.php" class="btn btn-secondary">Back to User List</a>
             </form>
-            <!-- Assigned Jobs Section -->
             <h3 class="mt-5">Assigned Jobs</h3>
             <table class="table table-bordered">
                 <thead>
@@ -162,7 +155,6 @@ $stmt->close();
                     <?php endwhile; ?>
                 </tbody>
             </table>
-            <!-- Pagination for Assigned Jobs -->
             <nav>
                 <ul class="pagination justify-content-center">
                     <?php if ($page > 1): ?>

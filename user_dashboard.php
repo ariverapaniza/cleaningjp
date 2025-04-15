@@ -1,14 +1,13 @@
 <?php
-// user_dashboard.php
 require 'config.php';
 
-// Only non-admin (cleaning staff) users should access this page
+// Only non-admin cleaning staff users should access this page
 if (!isLoggedIn() || isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Fetch jobs created by the logged-in cleaning staff member
+// fetch jobs created by the logged-in cleaning staff member
 $stmt = $mysqli->prepare("SELECT JobID, ClientName, JobDescription, ServiceDate FROM Jobs WHERE UserID = ? ORDER BY DateCreated DESC");
 $stmt->bind_param("i", $_SESSION['UserID']);
 $stmt->execute();
@@ -50,7 +49,6 @@ $stmt->close();
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Dashboard</h2>

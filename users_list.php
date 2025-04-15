@@ -1,14 +1,13 @@
 <?php
-// users_list.php
 require 'config.php';
 
-// Only admin users should access this page
+// only admin users should access this page
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Fetch all users
+// fetch all users
 $query = "SELECT UserID, Username, Email, IsAdmin FROM Users ORDER BY Username ASC";
 $result = $mysqli->query($query);
 ?>
@@ -46,7 +45,6 @@ $result = $mysqli->query($query);
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">User List</h2>
