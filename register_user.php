@@ -1,8 +1,7 @@
 <?php
-// register_user.php
 require 'config.php';
 
-// Only admins allowed
+// only admins allowed
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
@@ -18,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = trim($_POST['phone']);
     $about = trim($_POST['about']);
 
-    // Hash the password
+    // hash the password
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $mysqli->prepare("INSERT INTO Users (Username, Email, PasswordHash, IsAdmin, Address, JobDescription, Phone, About) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -48,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel form-panel">
         <div class="text-center panel-heading">
             <h2 class="title">Register New User</h2>

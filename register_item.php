@@ -1,8 +1,7 @@
 <?php
-// register_item.php
 require 'config.php';
 
-// Only admins allowed
+// only admins allowed
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
@@ -13,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $description = trim($_POST['description']);
     $quantity = intval($_POST['quantity']);
 
-    // Handle image upload
+    // handle image upload hopefully
     $imagePath = '';
     if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] == UPLOAD_ERR_OK) {
         $uploadDir = "uploads/";
@@ -51,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel form-panel">
         <div class="text-center panel-heading">
             <h2 class="title">Register New Item</h2>
@@ -83,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <label class="form-label">Item Image (50x50 recommended)</label>
                     <input type="file" name="item_image" class="form-control">
                 </div>
-                <button class="btn btn-primary" type="submit">Add Item</button>
+                <button class="btn btn-success" type="submit">Add Item</button>
             </form>
         </div>
     </div>

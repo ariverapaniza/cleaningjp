@@ -1,8 +1,7 @@
 <?php
-// register_client.php
 require 'config.php';
 
-// Only admins allowed
+// only admins allowed
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
@@ -40,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel form-panel">
         <div class="text-center panel-heading">
             <h2 class="title">Register Client</h2>
