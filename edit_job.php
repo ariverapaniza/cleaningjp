@@ -1,21 +1,20 @@
 <?php
-// edit_job.php
 require 'config.php';
 
-// Only admin users should access this page
+// Only admin users should access this page with this code
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Get job details
+
 if (!isset($_GET['jobid'])) {
     die("Job ID not provided.");
 }
 
 $jobID = intval($_GET['jobid']);
 
-// Fetch job data
+// fetch the job data
 $stmt = $mysqli->prepare("SELECT * FROM Jobs WHERE JobID = ?");
 $stmt->bind_param("i", $jobID);
 $stmt->execute();
@@ -23,32 +22,32 @@ $result = $stmt->get_result();
 $job = $result->fetch_assoc();
 $stmt->close();
 
-// Fetch clients for dropdown
+// fetch the clients for dropdown
 $clientsResult = $mysqli->query("SELECT ClientID, ClientName FROM Clients ORDER BY ClientName ASC");
 
-// Fetch all available items
+// fetch all available items that are on the database
 $itemsResult = $mysqli->query("SELECT * FROM Items");
 
-// Fetch currently selected items for the job
+// fetch currently selected items for the job
 $jobItems = [];
 $jobItemsQuery = $mysqli->prepare("SELECT ItemID, QuantityUsed FROM JobItems WHERE JobID = ?");
 $jobItemsQuery->bind_param("i", $jobID);
 $jobItemsQuery->execute();
 $jobItemsResult = $jobItemsQuery->get_result();
 while ($row = $jobItemsResult->fetch_assoc()) {
-    $jobItems[$row['ItemID']] = $row['QuantityUsed']; // Store items with their quantities
+    $jobItems[$row['ItemID']] = $row['QuantityUsed']; // store items with their quantities
 }
 $jobItemsQuery->close();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect updated job data
+    // collect the updated job data
     $clientID = intval($_POST['client_id']);
     $jobDescription = $mysqli->real_escape_string(trim($_POST['job_description']));
     $serviceDate = $mysqli->real_escape_string(trim($_POST['service_date']));
     $location = $mysqli->real_escape_string(trim($_POST['location']));
     $estimatedDuration = $mysqli->real_escape_string(trim($_POST['estimated_duration']));
 
-    // Fetch the actual client name based on ClientID
+    // fetch the actual client name based on ClientID
     $stmt = $mysqli->prepare("SELECT ClientName FROM Clients WHERE ClientID = ?");
     $stmt->bind_param("i", $clientID);
     $stmt->execute();
@@ -56,19 +55,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->fetch();
     $stmt->close();
 
-    // Update the job record
+    // uupdate the job record
     $stmt = $mysqli->prepare("UPDATE Jobs SET ClientID = ?, ClientName = ?, JobDescription = ?, ServiceDate = ?, Location = ?, EstimatedDuration = ? WHERE JobID = ?");
     $stmt->bind_param("isssssi", $clientID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration, $jobID);
     $stmt->execute();
     $stmt->close();
 
-    // Clear previous JobItems entries
+    // clear the previous JobItems entries
     $stmt = $mysqli->prepare("DELETE FROM JobItems WHERE JobID = ?");
     $stmt->bind_param("i", $jobID);
     $stmt->execute();
     $stmt->close();
 
-    // Loop through posted data for each selected item and insert new JobItems entries
+    // loop through the posted data for each selected item and insert new JobItems entries
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'item_') === 0 && $value === "on") {
             $itemID = str_replace('item_', '', $key);
@@ -76,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $quantityUsed = isset($_POST[$qtyField]) ? intval($_POST[$qtyField]) : 0;
 
             if ($quantityUsed > 0) {
-                // Insert new item selection
+                // insert new item selection
                 $stmt = $mysqli->prepare("INSERT INTO JobItems (JobID, ItemID, QuantityUsed) VALUES (?, ?, ?)");
                 $stmt->bind_param("iii", $jobID, $itemID, $quantityUsed);
                 $stmt->execute();
@@ -102,16 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Custom Stylesheet -->
     <link href="styles.css" rel="stylesheet">
     <script>
-        // Function to filter items based on search input (by item name and description)
+        
         function searchItems() {
             var input = document.getElementById("itemSearchInput").value.toLowerCase();
             var table = document.getElementById("itemsTable");
             var tr = table.getElementsByTagName("tr");
 
-            // Loop through all table rows (skip the header row)
             for (var i = 1; i < tr.length; i++) {
-                var tdName = tr[i].getElementsByTagName("td")[2]; // Item Name column
-                var tdDesc = tr[i].getElementsByTagName("td")[3]; // Description column
+                var tdName = tr[i].getElementsByTagName("td")[2];
+                var tdDesc = tr[i].getElementsByTagName("td")[3];
                 if (tdName && tdDesc) {
                     var txtValueName = tdName.textContent || tdName.innerText;
                     var txtValueDesc = tdDesc.textContent || tdDesc.innerText;
@@ -128,7 +126,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Wrap edit job content inside a panel -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Edit Job</h2>
