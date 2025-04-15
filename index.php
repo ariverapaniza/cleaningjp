@@ -1,8 +1,6 @@
 <?php
-// index.php
 require 'config.php';
 
-// If user is already logged in, redirect accordingly.
 if (isLoggedIn()) {
     if (isAdmin()) {
         header("Location: dashboard.php");
@@ -16,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    // Prepare and execute statement
     $stmt = $mysqli->prepare("SELECT UserID, Username, PasswordHash, IsAdmin FROM Users WHERE Username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -26,13 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->num_rows > 0 && $stmt->fetch()) {
         // Verify password
         if (password_verify($password, $PasswordHash)) {
-            // Set session variables
             $_SESSION['UserID'] = $UserID;
             $_SESSION['Username'] = $Username;
             $_SESSION['IsAdmin'] = $IsAdmin;
             session_regenerate_id();
 
-            // Redirect based on role
             if ($IsAdmin) {
                 header("Location: dashboard.php");
             } else {
@@ -65,28 +60,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <?php include('navbar.php'); ?>
 
-    <!-- Logo Section (100px margin below the logo) -->
     <div class="container text-center mt-5" style="margin-bottom: 100px;">
         <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
     </div>
 
-    <!-- Center the login card horizontally -->
     <div class="container d-flex justify-content-center">
-        <!-- Login Card -->
         <div class="login-card p-4">
-            <!-- Optional User Icon -->
             <div class="login-icon text-center mb-3">
                 <img src="img/userlogin.png" alt="User Icon" style="width:80px;">
             </div>
-            <!-- Title -->
             <h2 class="text-center mb-4" style="color: #9b59b6;">LOGIN</h2>
 
-            <!-- Display error message if login fails -->
             <?php if (isset($error)): ?>
                 <div class="alert alert-danger text-center"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
 
-            <!-- Login Form -->
             <form method="post" action="index.php">
                 <div class="mb-3">
                     <label class="form-label" style="color: #9b59b6;">Username</label>

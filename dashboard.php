@@ -1,26 +1,22 @@
 <?php
-// dashboard.php
 require 'config.php';
 
-// Only admins should access this page
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Pagination settings
-$jobsPerPage = 10; // Number of jobs per page
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1; // Get the current page or default to 1
-$offset = ($page - 1) * $jobsPerPage; // Calculate the offset
+$jobsPerPage = 10;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1; 
+$offset = ($page - 1) * $jobsPerPage; 
 
-// Fetch total number of jobs
 $totalJobsQuery = "SELECT COUNT(*) AS total FROM Jobs";
 $totalJobsResult = $mysqli->query($totalJobsQuery);
 $totalJobsRow = $totalJobsResult->fetch_assoc();
 $totalJobs = $totalJobsRow['total'];
 $totalPages = ceil($totalJobs / $jobsPerPage);
 
-// Fetch jobs with pagination
+
 $query = "SELECT j.JobID, j.ClientID, j.ClientName, j.JobDescription, j.ServiceDate, u.Username
           FROM Jobs j
           INNER JOIN Users u ON j.UserID = u.UserID
@@ -63,13 +59,11 @@ $result = $mysqli->query($query);
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Wrap main content inside a panel -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Admin Dashboard</h2>
         </div>
         <div class="p-4 panel-body">
-            <!-- Six Admin Panels Cards -->
             <div class="row text-center mb-4">
                 <div class="col-md-3 d-inline-block mb-3">
                     <div class="card h-100">
@@ -138,7 +132,6 @@ $result = $mysqli->query($query);
                     </div>
                 </div>
             </div>
-            <!-- Job Table Section -->
             <div class="mb-3">
                 <input type="text" id="searchInput" onkeyup="searchJobs()" placeholder="Search jobs..." class="form-control search-input">
             </div>
@@ -180,7 +173,6 @@ $result = $mysqli->query($query);
                 </tbody>
             </table>
         </div>
-        <!-- Panel Footer with Pagination -->
         <div class="panel-footer">
             <nav>
                 <ul class="justify-content-center pagination">
