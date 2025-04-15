@@ -1,22 +1,18 @@
 <?php
-// job_form_admin.php
 require 'config.php';
 
-// Only admin users should access this page
 if (!isLoggedIn() || !isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Fetch available items from the Items table
 $itemsResult = $mysqli->query("SELECT * FROM Items");
-// Fetch clients for the dropdown
+// fetch clients for the dropdown
 $clientsResult = $mysqli->query("SELECT ClientID, ClientName FROM Clients ORDER BY ClientName ASC");
-// Fetch non-admin (cleaning staff) users for the dropdown
+// fetch non-admin (cleaning staff old and new) users for the dropdown
 $usersResult = $mysqli->query("SELECT UserID, Username FROM Users WHERE IsAdmin = 0 ORDER BY Username ASC");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect and sanitize job data
     $assignedUserID = intval($_POST['assigned_user']);
     $clientID = intval($_POST['client_id']);
     $jobDescription = $mysqli->real_escape_string(trim($_POST['job_description']));
@@ -24,34 +20,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $location = $mysqli->real_escape_string(trim($_POST['location']));
     $estimatedDuration = $mysqli->real_escape_string(trim($_POST['estimated_duration']));
 
-    // Fetch the actual client name based on ClientID
+    // fetch the actual client name based on ClientID
     $stmt = $mysqli->prepare("SELECT ClientName FROM Clients WHERE ClientID = ?");
     $stmt->bind_param("i", $clientID);
     $stmt->execute();
     $stmt->bind_result($clientName);
     $stmt->fetch();
     $stmt->close();
+    if (empty($clientName)) {
+        $error = "Invalid client selected.";
 
-    // Insert into Jobs table with ClientID and ClientName
+        header("Location: job_form_admin.php?error=" . urlencode($error));
+        exit;
+    }
     $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iisssss", $assignedUserID, $clientID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
     if ($stmt->execute()) {
         $jobID = $stmt->insert_id;
         $stmt->close();
 
-        // Loop through posted data for each item checkbox (names starting with "item_")
+        // loop through posted data for each item checkbox
         foreach ($_POST as $key => $value) {
             if (strpos($key, 'item_') === 0 && $value === "on") {
                 $itemID = str_replace('item_', '', $key);
                 $qtyField = 'qty_' . $itemID;
                 $quantityUsed = isset($_POST[$qtyField]) ? intval($_POST[$qtyField]) : 0;
                 if ($quantityUsed > 0) {
-                    // Insert into JobItems table
                     $stmt2 = $mysqli->prepare("INSERT INTO JobItems (JobID, ItemID, QuantityUsed) VALUES (?, ?, ?)");
                     $stmt2->bind_param("iii", $jobID, $itemID, $quantityUsed);
                     $stmt2->execute();
                     $stmt2->close();
-                    // Deduct quantity from Items table
                     $stmt3 = $mysqli->prepare("UPDATE Items SET Quantity = Quantity - ? WHERE ItemID = ?");
                     $stmt3->bind_param("ii", $quantityUsed, $itemID);
                     $stmt3->execute();
@@ -79,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Custom Stylesheet -->
     <link href="styles.css" rel="stylesheet">
     <style>
-        /* Optional inline adjustment for search input */
+
         #itemSearchInput {
             margin-bottom: 15px;
         }
@@ -88,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Create New Job Form (Admin)</h2>
@@ -100,13 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="post" action="job_form_admin.php">
                 <div class="row align-items-center mb-4">
                     <div class="col-md-6">
-                        <!-- Title is in panel heading -->
                     </div>
                     <div class="col-md-6 text-end">
-                        <button class="btn btn-primary" type="submit">Submit Job Form</button>
+                        <button class="btn btn-success" type="submit">Submit Job Form</button>
                     </div>
                 </div>
-                <!-- Job Assignment Dropdown -->
                 <div class="mb-3">
                     <label class="form-label">Assign Job to Cleaning Staff</label>
                     <select name="assigned_user" class="form-select" required>
@@ -118,7 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php endwhile; ?>
                     </select>
                 </div>
-                <!-- Job Details Fields -->
                 <div class="mb-3">
                     <label class="form-label">Client Name</label>
                     <select name="client_id" class="form-select" required>
@@ -146,16 +140,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <label class="form-label">Estimated Duration</label>
                     <input type="text" name="estimated_duration" class="form-control" required placeholder="e.g., 3 hours">
                 </div>
-                <!-- Display Success or Error Messages -->
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success">Job form submitted successfully!</div>
                 <?php endif; ?>
                 <?php if (isset($error)): ?>
                     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
-                <!-- Items Section -->
                 <h4>Select Items</h4>
-                <!-- Search Bar for Items -->
                 <input type="text" id="itemSearchInput" onkeyup="searchItems()"
                     placeholder="Search items by name or description..." class="form-control search-input">
                 <table class="table table-bordered" id="itemsTable">
@@ -171,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </thead>
                     <tbody>
                         <?php
-                        // Reset pointer in case it was used earlier
                         $itemsResult->data_seek(0);
                         while ($item = $itemsResult->fetch_assoc()): ?>
                             <tr>
@@ -202,7 +192,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to filter items based on search input (by item name and description)
         function searchItems() {
             var input = document.getElementById("itemSearchInput").value.toLowerCase();
             var table = document.getElementById("itemsTable");

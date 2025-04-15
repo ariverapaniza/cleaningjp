@@ -1,8 +1,6 @@
 <?php
-// job_details.php
 require 'config.php';
 
-// Only logged in users can view details
 if (!isLoggedIn()) {
     header("Location: index.php");
     exit;
@@ -14,7 +12,7 @@ if (!isset($_GET['jobid'])) {
 
 $jobID = intval($_GET['jobid']);
 
-// Fetch job details
+// fetch job details
 $stmt = $mysqli->prepare("SELECT j.JobID, j.ClientName, j.JobDescription, j.ServiceDate, j.Location, j.EstimatedDuration, u.Username 
                           FROM Jobs j 
                           INNER JOIN Users u ON j.UserID = u.UserID 
@@ -29,7 +27,7 @@ if (!$job) {
     die("Job not found.");
 }
 
-// Fetch associated job items
+// fetch associated job items
 $stmt2 = $mysqli->prepare("SELECT ji.QuantityUsed, i.ItemName, i.Description, i.ImagePath 
                            FROM JobItems ji 
                            INNER JOIN Items i ON ji.ItemID = i.ItemID 
@@ -55,7 +53,6 @@ $stmt2->close();
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Wrap details content in a panel -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Job Details</h2>
@@ -64,7 +61,6 @@ $stmt2->close();
             <div class="text-center mb-4">
                 <img src="img/CleaningLogoBlack.png" alt="Cleaning Logo" class="img-fluid" style="max-width: 500px;">
             </div>
-            <!-- Group 1: Basic Job Information -->
             <div class="card mb-3">
                 <div class="card-header">
                     <strong>Job Information</strong>
@@ -77,7 +73,6 @@ $stmt2->close();
                     <p><strong>Created By:</strong> <?php echo htmlspecialchars($job['Username']); ?></p>
                 </div>
             </div>
-            <!-- Group 2: Additional Details -->
             <div class="card mb-3">
                 <div class="card-header">
                     <strong>Additional Details</strong>
@@ -87,7 +82,6 @@ $stmt2->close();
                     <p><strong>Estimated Duration:</strong> <?php echo htmlspecialchars($job['EstimatedDuration']); ?></p>
                 </div>
             </div>
-            <!-- Group 3: Selected Items -->
             <div class="card mb-3">
                 <div class="card-header">
                     <strong>Selected Items</strong>
@@ -121,10 +115,9 @@ $stmt2->close();
                     </table>
                 </div>
             </div>
-            <!-- Buttons -->
             <div class="d-flex justify-content-between">
                 <a href="dashboard.php" class="btn btn-secondary">Back</a>
-                <button type="button" class="btn btn-primary" onclick="window.print();">Print Form</button>
+                <button type="button" class="btn btn-success" onclick="window.print();">Print Form</button>
             </div>
         </div>
     </div>
