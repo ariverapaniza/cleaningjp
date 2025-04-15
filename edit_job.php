@@ -202,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary me-2">Update Job</button>
+                    <button type="submit" class="btn btn-success me-2">Update Job</button>
                     <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
