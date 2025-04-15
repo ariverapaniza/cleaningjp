@@ -1,5 +1,4 @@
 <?php
-// navbar.php
 require_once 'config.php';
 ?>
 <nav class="navbar navbar-custom navbar-expand-lg">

@@ -1,27 +1,23 @@
 <?php
-// job_form.php
 require 'config.php';
 
-// Only logged in cleaning staff (non-admin) should access this page
 if (!isLoggedIn() || isAdmin()) {
     header("Location: index.php");
     exit;
 }
 
-// Fetch available items from the Items table
 $itemsResult = $mysqli->query("SELECT * FROM Items");
-// Fetch clients for the dropdown
+
 $clientsResult = $mysqli->query("SELECT ClientID, ClientName FROM Clients ORDER BY ClientName ASC");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect and sanitize job data
     $clientID = intval($_POST['client_id']);
     $jobDescription = $mysqli->real_escape_string(trim($_POST['job_description']));
     $serviceDate = $mysqli->real_escape_string(trim($_POST['service_date']));
     $location = $mysqli->real_escape_string(trim($_POST['location']));
     $estimatedDuration = $mysqli->real_escape_string(trim($_POST['estimated_duration']));
 
-    // Fetch the actual client name based on ClientID
+    // fetch the actual client name based on ClientID
     $stmt = $mysqli->prepare("SELECT ClientName FROM Clients WHERE ClientID = ?");
     $stmt->bind_param("i", $clientID);
     $stmt->execute();
@@ -29,14 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->fetch();
     $stmt->close();
 
-    // Insert into Jobs table with ClientID and ClientName
+    // insert into Jobs table with ClientID and ClientName
     $stmt = $mysqli->prepare("INSERT INTO Jobs (UserID, ClientID, ClientName, JobDescription, ServiceDate, Location, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iisssss", $_SESSION['UserID'], $clientID, $clientName, $jobDescription, $serviceDate, $location, $estimatedDuration);
     if ($stmt->execute()) {
         $jobID = $stmt->insert_id;
         $stmt->close();
 
-        // Loop through posted data for each item checkbox (names starting with "item_")
         foreach ($_POST as $key => $value) {
             if (strpos($key, 'item_') === 0 && $value === "on") {
                 $itemID = str_replace('item_', '', $key);
@@ -84,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include('navbar.php'); ?>
-    <!-- Panel container -->
     <div class="container mt-5 panel">
         <div class="text-center panel-heading">
             <h2 class="title">Create New Job Form</h2>
@@ -96,13 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="post" action="job_form.php">
                 <div class="row align-items-center mb-4">
                     <div class="col-md-6">
-                        <!-- Title is in panel heading -->
                     </div>
                     <div class="col-md-6 text-end">
-                        <button class="btn btn-primary" type="submit">Submit Job Form</button>
+                        <button class="btn btn-success" type="submit">Submit Job Form</button>
                     </div>
                 </div>
-                <!-- Job Details Fields -->
                 <div class="mb-3">
                     <label class="form-label">Client Name</label>
                     <select name="client_id" class="form-select" required>
@@ -130,14 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <label class="form-label">Estimated Duration</label>
                     <input type="text" name="estimated_duration" class="form-control" required placeholder="e.g., 3 hours">
                 </div>
-                <!-- Display Success or Error Messages -->
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success">Job form submitted successfully!</div>
                 <?php endif; ?>
                 <?php if (isset($error)): ?>
                     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
-                <!-- Items Section -->
                 <h4>Select Items</h4>
                 <input type="text" id="itemSearchInput" onkeyup="searchItems()"
                     placeholder="Search items by name or description..." class="form-control search-input">
